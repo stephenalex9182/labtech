@@ -1,0 +1,10 @@
+import React from "react";
+import { ShieldCheck, KeyRound, UsersRound, ClipboardList, SlidersHorizontal } from "lucide-react";
+import { C, Card } from "../components/ui";
+const cards = [
+  { Icon: ShieldCheck, title: "Audit trail & access logging", text: "Every record view, update and document download is captured with actor, time and report context." },
+  { Icon: KeyRound, title: "Time-limited access", text: "Authenticated sessions expire automatically. Sensitive-document links are designed for single-use delivery." },
+  { Icon: UsersRound, title: "Expanded access roles", text: "Department Head, Radiologist / Consultant and Compliance Auditor scopes are ready for policy assignment." },
+  { Icon: SlidersHorizontal, title: "Custom triage rules", text: "Department administrators can manage reference thresholds and risk formulas with clinical governance." },
+];
+export default function SecurityCompliance() { return <div className="flex-1 p-6 lg:p-8"><h1 className="text-xl font-bold" style={{color:C.text}}>Security & compliance</h1><p className="text-sm mb-6" style={{color:C.subtext}}>Privacy controls designed for sensitive clinical workflows.</p><div className="grid md:grid-cols-2 gap-5">{cards.map(({Icon,title,text}) => <Card key={title} className="p-5"><Icon size={20} color={C.primary}/><h2 className="font-semibold text-sm mt-3" style={{color:C.text}}>{title}</h2><p className="text-xs leading-relaxed mt-2" style={{color:C.subtext}}>{text}</p></Card>)}</div><Card className="p-5 mt-5"><div className="flex items-center gap-2"><ClipboardList size={18} color={C.secondary}/><div><div className="font-semibold text-sm" style={{color:C.text}}>Compliance operating model</div><div className="text-xs mt-1" style={{color:C.subtext}}>Audit events are retained server-side. Configure Google OAuth credentials and production key rotation before handling live patient data.</div></div></div></Card></div>; }

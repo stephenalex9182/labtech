@@ -1,0 +1,17 @@
+import React, { useEffect, useState } from "react";
+import { LineChart, Line, ResponsiveContainer, XAxis, YAxis, Tooltip, Legend } from "recharts";
+import { ShieldCheck, FileSearch, SlidersHorizontal, TrendingUp } from "lucide-react";
+import { C, Card } from "../components/ui";
+import { reportsApi } from "../services/api";
+import type { PatientHistoryItem } from "../types";
+
+export default function ClinicalIntelligence() {
+  const [patients, setPatients] = useState<PatientHistoryItem[]>([]);
+  const [selected, setSelected] = useState<PatientHistoryItem | null>(null);
+  useEffect(() => { reportsApi.searchPatientHistory("P").then(x => { setPatients(x); setSelected(x[0] || null); }).catch(() => {}); }, []);
+  const chart = selected ? [...selected.reports].reverse().map((r, i) => ({ visit: `Visit ${i + 1}`, Hemoglobin: r.lab_results.find(x => x.test_name === "Hemoglobin")?.value, Creatinine: r.lab_results.find(x => x.test_name === "Creatinine")?.value, WBC: r.lab_results.find(x => x.test_name === "WBC")?.value })) : [];
+  return <div className="flex-1 p-6 lg:p-8"><h1 className="text-xl font-bold" style={{color:C.text}}>Clinical intelligence</h1><p className="text-sm mb-6" style={{color:C.subtext}}>Longitudinal review, comparison and extraction quality at a glance.</p>
+    <div className="grid lg:grid-cols-3 gap-5"><Card className="p-4"><div className="font-semibold text-sm mb-3" style={{color:C.text}}>Patient history</div>{patients.map(p => <button key={p.patient_id} onClick={()=>setSelected(p)} className="w-full text-left p-3 rounded-lg mb-2" style={{background:selected?.patient_id===p.patient_id?"#EFF6FF":C.bg}}><div className="text-sm font-semibold" style={{color:C.text}}>{p.name}</div><div className="text-xs" style={{color:C.subtext}}>{p.unique_id} · {p.reports.length} visits</div></button>)}</Card>
+    <div className="lg:col-span-2 space-y-5"><Card className="p-5"><div className="flex gap-2 items-center mb-4"><TrendingUp size={18} color={C.primary}/><div><div className="font-semibold text-sm" style={{color:C.text}}>Longitudinal trends</div><div className="text-xs" style={{color:C.subtext}}>Historical values; clinical verification required.</div></div></div><div style={{height:250}}><ResponsiveContainer><LineChart data={chart}><XAxis dataKey="visit"/><YAxis/><Tooltip/><Legend/><Line type="monotone" dataKey="Hemoglobin" stroke="#2563EB"/><Line type="monotone" dataKey="Creatinine" stroke="#EA580C"/><Line type="monotone" dataKey="WBC" stroke="#0F766E"/></LineChart></ResponsiveContainer></div></Card>
+    <div className="grid sm:grid-cols-2 gap-5"><Card className="p-5"><div className="flex gap-2"><FileSearch size={18} color={C.primary}/><div><div className="font-semibold text-sm" style={{color:C.text}}>Side-by-side comparison</div><p className="text-xs mt-2" style={{color:C.subtext}}>Select any two visits to compare result changes and reference ranges before review.</p><button className="text-xs font-semibold mt-3" style={{color:C.primary}}>Open comparison →</button></div></div></Card><Card className="p-5"><div className="flex gap-2"><ShieldCheck size={18} color={C.secondary}/><div><div className="font-semibold text-sm" style={{color:C.text}}>OCR confidence</div><p className="text-xs mt-2" style={{color:C.subtext}}>High: 96–100% · Medium: 80–95% · Low: below 80%. Low-confidence values require confirmation.</p></div></div></Card></div></div></div></div>;
+}
